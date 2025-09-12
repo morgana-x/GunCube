@@ -24,8 +24,8 @@ namespace GunCube.Modules.Projectile
         {
             for (int i = 0; i < 5; i++)
             {
-                Effect.EmitEffect(Level, Effect.Effects.Bullet_Trail, Pos - (Vel*i*0.2f));
-                Effect.EmitEffect(Level, Effect.Effects.Bullet_Trail2, Pos - (Vel*i*0.2f));
+                Effect.EmitEffect(Level, Effect.Effects.Bullet_Trail, Pos + (Vel*i*0.05f));
+                Effect.EmitEffect(Level, Effect.Effects.Bullet_Trail2, Pos + (Vel*i*0.05f));
             }
             //    Effect.EmitEffect(Level, Effect.Effects.Snowball_Ball, Pos);
             return base.Tick(curtime);

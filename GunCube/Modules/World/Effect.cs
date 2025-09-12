@@ -117,6 +117,7 @@ namespace GunCube.Modules.World
             {
                 if (pl.level != level) continue;
                 if (!pl.Session.hasCpe) continue;
+                if ((pl.Pos.ToVec3F32() - new Vec3F32(x, y, z)).LengthSquared > 250000) continue;
                 pl.Send(packet);
             }
         }
