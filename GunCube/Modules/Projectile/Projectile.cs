@@ -1,0 +1,201 @@
+﻿using MCGalaxy;
+using MCGalaxy.Maths;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GunCube.Modules.Projectile
+{
+    public class Projectile
+    {
+        public static Dictionary<Level, List<Projectile>> Projectiles = new Dictionary<Level, List<Projectile>>();
+
+        public static void TickAll(float curtime)
+        {
+            int i = 0;
+            while (i < Projectiles.Count)
+            {
+                var pair = Projectiles.ElementAt(i);
+
+                if (pair.Key.players.Count == 0)
+                {
+                    Projectiles.Remove(pair.Key);
+                    continue;
+                };
+
+                int j = 0;
+                while (j < pair.Value.Count)
+                {
+                    try
+                    {
+                        if (pair.Value[j].Tick(curtime))
+                        {
+                            pair.Value[j].OnDestroy();
+                            pair.Value.Remove(pair.Value[j]);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        pair.Value[j].OnDestroy();
+                        pair.Value.Remove(pair.Value[j]);
+                    }
+                    j++;
+                }
+
+                i++;
+            }
+        }
+
+        public static void Spawn(Level level, Projectile projectile)
+        {
+            if (!Projectiles.ContainsKey(level))
+                Projectiles.Add(level, new List<Projectile>());
+
+            projectile.Level = level;
+            projectile.Creation = DateTime.Now;
+            projectile.Expiration = projectile.Creation.AddSeconds(projectile.LifeTime);
+
+            Projectiles[level].Add(projectile);
+        }
+
+        public static void Throw(Level level, Projectile projectile, Vec3F32 position, Vec3F32 dir, Player thrower = null)
+        {
+            projectile.Level = level;
+            projectile.Pos = position;
+            projectile.Vel = dir;
+            projectile.Thrower = thrower;
+            Spawn(level, projectile);
+        }
+
+        public static void Throw(Player p, Projectile projectile, ushort yaw, ushort pitch, float power = 2.5f)
+        {
+            var dir = DirUtils.GetDirVectorExt(yaw, pitch);
+            Throw(p.level, projectile, p.Pos.ToVec3F32() + dir * 0.1f, dir * power, p);
+        }
+
+        public void Throw(Player p, ushort yaw, ushort pitch, float power = 2.5f)
+        {
+            Throw(p, this, yaw, pitch, power);
+        }
+        public Projectile()
+        {
+        }
+        public Projectile(Level level, Player thrower, Vec3F32 position, Vec3F32 velocity)
+        {
+            Level = level;
+            Thrower = thrower;
+            Pos = position;
+            Vel = velocity;
+        }
+
+        public void Spawn()
+        {
+            Spawn(Level, this);
+        }
+
+        public Player Thrower = null;
+        public Level Level;
+
+        public Vec3F32 Pos;
+        public Vec3F32 Vel;
+        public Vec3U16 BlockPos { get { return Util.Round(Pos); } set { Pos.X = value.X << 5; Pos.Y = value.Y << 5; Pos.Z = value.Z << 5; } }
+
+        public virtual float Drag => 0.95f;
+        public virtual float Gravity => 0.7f;
+
+        public virtual float Radius => 1f;
+
+        public bool destroy = false;
+
+        public virtual float LifeTime => 100;
+
+        public DateTime Expiration;
+        public DateTime Creation;
+        private ushort CollidedBlock()
+        {
+            var bp = BlockPos;
+            return Level.GetBlock(bp.X, bp.Y, bp.Z);
+        }
+
+        private Player CollidedPlayer()
+        {
+            return Util.PlayerAt(Level, Pos, Radius);
+        }
+        private List<Player> CollidedPlayers()
+        {
+            return Util.PlayersAt(Level, Pos, Radius);
+        }
+        public virtual bool Tick(float curtime)
+        {
+            if (destroy)
+                return true;
+            if (DateTime.Now > Expiration)
+                return true;
+
+            Vel *= Drag;
+            if (Gravity != 0 && Vel.Y > -Gravity)
+                Vel.Y -= 0.1f;
+
+            for (int i = 0; i < 10; i++)
+            {
+                Pos += Vel * 0.1f * curtime;
+
+                if (Pos.Y < 0 || Pos.X < 0 || Pos.Z < 0)
+                    return true;
+                if (Pos.X >= Level.Width || Pos.Z >= Level.Length || Pos.Y >= Level.Height)
+                    return true;
+
+                var block = CollidedBlock();
+                var pl = CollidedPlayer();
+
+                bool donthitself = DateTime.Now < Creation.AddMilliseconds(150);
+                if (pl != null && donthitself && pl == Thrower) pl = null;
+                if (block == 0 && pl == null) continue;
+
+                if (pl == null)
+                {
+                    OnCollide(block, null);
+                    return true;
+                }
+
+                int count = 0;
+                foreach (var p in CollidedPlayers())
+                {
+                    if (p == Thrower && donthitself) continue;
+
+                    bool cancel = false;
+                    Events.PlayerEvents.PlayerHitBySnowballEvent.Call(p, this, ref cancel);
+                    if (cancel) { continue; }
+
+                    OnCollide(block, p);
+                    count++;
+                }
+
+                if (count == 0)
+                    OnCollide(block, null);
+
+                return true;
+   
+            }
+
+            return false;
+        }
+
+
+        public void Destroy()
+        {
+            destroy = true;
+        }
+
+        public virtual void OnDestroy()
+        {
+
+        }
+
+        public virtual void OnCollide(ushort block, Player pl)
+        {
+
+        }
+    }
+}
