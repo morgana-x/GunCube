@@ -1,7 +1,7 @@
 ﻿using System;
 using MCGalaxy;
 
-namespace GunCube.Modules.Item
+namespace GunCube.Modules.Item.Guns
 {
     public class Laser : GunItem
     {

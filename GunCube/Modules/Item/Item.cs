@@ -17,8 +17,8 @@ namespace GunCube.Modules.Item
         {
             OnPlayerClickEvent.Register(OnPlayerClick, MCGalaxy.Priority.Normal);
 
-            RegisterItem(new Laser());
-            RegisterItem(new Gun());
+            RegisterItem(new Guns.Laser());
+            RegisterItem(new Guns.Gun());
         }
         public static void Unload()
         {

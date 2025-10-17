@@ -60,14 +60,19 @@ namespace GunCube.Modules.Players
         {
             None,
             Snowball,
-            Fall
+            Fall,
+            Bullet
         }
 
         public static Dictionary<DamageType, DamageDataDeathMessage> DeathMessages = new Dictionary<DamageType, DamageDataDeathMessage>()
         {
             [DamageType.None] = new DamageDataDeathMessage("@v &ewas murdered by @k", "@v &egot bored of life", "@v &edied."),
             [DamageType.Snowball] = new DamageDataDeathMessage(new string[] {"@v &egot &bsnowed &eby @k", "@k &egave @v &bbrain freeze", "@v &baccepted snow to the face &efrom @k", "@v &egot &bsmashed with snow &efrom @k"}, new string[] { "@v &cfailed to dodge their own snowball", "@v &clearnt that what goes up must come down", "@v &cloved snow a bit too much" }, new string[] { "@v &edied of &csnow exposure" }),
-            [DamageType.Fall] = new DamageDataDeathMessage(new string[] {"@v&e's legs were shattered by @k", "@v &cwas &c(russian)&e\"&9fell out window&e\" by @k"}, new string[] {"@v &elistened to the voices and jumped"}, new string[] {"@v&e's legs were &cshattered", "@v &ecouldn't break their fall"})
+            [DamageType.Fall] = new DamageDataDeathMessage(new string[] {"@v&e's legs were shattered by @k", "@v &cwas &c(russian)&e\"&9fell out window&e\" by @k"}, new string[] {"@v &elistened to the voices and jumped"}, new string[] {"@v&e's legs were &cshattered", "@v &ecouldn't break their fall"}),
+            [DamageType.Bullet] = new DamageDataDeathMessage(new string[] 
+            { "@v &egot &cshot &eby @k", "@v &cgot riddled with bullets &efrom @k" },  new string[]
+            { "@v &cfailed to dodge their own bullet" }, new string[]
+            { "@v &edied of &cbullets" }),
         };
 
 

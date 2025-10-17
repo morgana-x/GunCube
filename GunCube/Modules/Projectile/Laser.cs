@@ -3,7 +3,7 @@ using MCGalaxy.Blocks;
 using MCGalaxy.Maths;
 using GunCube.Modules.Players;
 using GunCube.Modules.World;
-using static GunCube.Events.PlayerEvents;
+
 namespace GunCube.Modules.Projectile
 {
     public class Laser : Projectile

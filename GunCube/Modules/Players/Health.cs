@@ -62,12 +62,12 @@ namespace GunCube.Modules.Players
             Events.PlayerEvents.PlayerKilledEvent.Call(player, ref damageData);
 
  
-            player.HandleDeath(4, damageData.DeathMessage, false, false);
+            player.HandleDeath(4, damageData.AnnounceDeath ? damageData.DeathMessage : null, false, false);
         }
         public static bool Dead(MCGalaxy.Player player)
         {
             if (Util.IsNoDamageLevel(player.level)) return false;
-            return GetHealth(player) <= 0;
+            return GetHealth(player) <= 0 || player.Extras.GetBoolean("spectator");
         }
 
     }

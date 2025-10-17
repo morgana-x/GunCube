@@ -1,7 +1,6 @@
-﻿using GunCube.Modules.Projectile;
-using MCGalaxy;
+﻿using MCGalaxy;
 
-namespace GunCube.Modules.Item
+namespace GunCube.Modules.Item.Guns
 {
     public class Gun : GunItem
     {
@@ -11,10 +10,5 @@ namespace GunCube.Modules.Item
 
         public override float ShootCooldown => 0.1f;
         public override float Spread => 1000f;
-
-        public override Projectile.Projectile CreateProjectile()
-        {
-            return new Bullet();
-        }
     }
 }
